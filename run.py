@@ -3,16 +3,20 @@ from ShellyPy import Shelly
 import time
 from datetime import datetime, timedelta
 
-# Hämta elpriserna från elprisetjustnu.se
-url = "https://www.elprisetjustnu.se/api/v1/prices/2024/10-07_SE3.json"
-threshold_price = 0.4  # SEK/kWh
+# Skapar url för att hämta dagens priser
+def get_url_for_today():
+    today = datetime.now().strftime('%Y/%m-%d')
+    return f"https://www.elprisetjustnu.se/api/v1/prices/{today}_SE3.json"
 
-# Funktion för att kolla priset och kontrollera Shelly-relä
+threshold_price = 0.10  # SEK/kWh
+
+# Hämtar akturellt pris och kontrollerar Shelly-relä
 def check_prices():
+    url = get_url_for_today()
     response = requests.get(url)
     prices = response.json()
 
-    current_hour = datetime.now().hour  # Hämta aktuell timme
+    current_hour = datetime.now().hour
     price_sek = prices[current_hour]["SEK_per_kWh"]
 
     # Anslut till Shelly
@@ -21,14 +25,14 @@ def check_prices():
     # Kontrollera om priset är under tröskelvärdet
     if price_sek < threshold_price:
         shelly.relay(0, turn=True)
-        print(current_hour)
+        print(url)
         print(f"Relä aktiverat vid pris {price_sek} SEK/kWh")
     else:
         shelly.relay(0, turn=False)
-        print(current_hour)
+        print(url)
         print(f"Relä avaktiverat vid pris {price_sek} SEK/kWh")
 
-# Funktion för att vänta till nästa hel timme
+# Räknar ut nästa heltimme
 def wait_until_next_hour():
     now = datetime.now()
     next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
@@ -39,4 +43,4 @@ def wait_until_next_hour():
 # Loop för att kontrollera priset varje timme
 while True:
     check_prices()
-    wait_until_next_hour()  # Väntar tills nästa timme innan den kör igen
+    wait_until_next_hour()
