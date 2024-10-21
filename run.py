@@ -3,6 +3,9 @@ from ShellyPy import Shelly
 import time
 from datetime import datetime, timedelta
 
+ip = "10.30.10.51" # IP till Shelly enhet
+threshold_price = 0.10 # SEK/kWh
+
 # Skapar url för att hämta dagens priser
 def get_url_for_today():
     today = datetime.now().strftime('%Y/%m-%d')
@@ -20,16 +23,16 @@ def check_prices():
     price_sek = prices[current_hour]["SEK_per_kWh"]
 
     # Anslut till Shelly
-    shelly = Shelly("10.30.10.51")
+    shelly = Shelly(ip)
     
     # Kontrollera om priset är under tröskelvärdet
     if price_sek < threshold_price:
         shelly.relay(0, turn=True)
-        print(url)
+        print(url) #För temporär koll
         print(f"Relä aktiverat vid pris {price_sek} SEK/kWh")
     else:
         shelly.relay(0, turn=False)
-        print(url)
+        print(url) #För temporär koll
         print(f"Relä avaktiverat vid pris {price_sek} SEK/kWh")
 
 # Räknar ut nästa heltimme
