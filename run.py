@@ -4,12 +4,13 @@ import time
 from datetime import datetime, timedelta
 from rich.console import Console
 from rich.text import Text
-
-# Instans för konsolutskrifter med `textual`
-console = Console()
+import pyfiglet
 
 ip = "10.30.10.51"  # IP till Shelly enhet
 threshold_price = 0.10  # SEK/kWh
+
+# Instans för konsolutskrifter med `textual`
+console = Console()
 
 # Skapar URL för att hämta dagens priser
 def get_url_for_today():
@@ -18,6 +19,11 @@ def get_url_for_today():
 
 # Hämtar aktuellt pris och kontrollerar Shelly-relä
 def check_prices():
+    console.clear()
+
+    logo = pyfiglet.figlet_format("Elpris Shelly", font = "slant") 
+    print(logo)
+
     url = get_url_for_today()
     response = requests.get(url)
     prices = response.json()
