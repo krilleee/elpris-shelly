@@ -2,18 +2,21 @@ import requests
 from ShellyPy import Shelly
 import time
 from datetime import datetime, timedelta
+from rich.console import Console
+from rich.text import Text
 
-ip = "10.30.10.51" # IP till Shelly enhet
-threshold_price = 0.10 # SEK/kWh
+# Instans för konsolutskrifter med `textual`
+console = Console()
 
-# Skapar url för att hämta dagens priser
+ip = "10.30.10.51"  # IP till Shelly enhet
+threshold_price = 0.10  # SEK/kWh
+
+# Skapar URL för att hämta dagens priser
 def get_url_for_today():
     today = datetime.now().strftime('%Y/%m-%d')
     return f"https://www.elprisetjustnu.se/api/v1/prices/{today}_SE3.json"
 
-threshold_price = 0.10  # SEK/kWh
-
-# Hämtar akturellt pris och kontrollerar Shelly-relä
+# Hämtar aktuellt pris och kontrollerar Shelly-relä
 def check_prices():
     url = get_url_for_today()
     response = requests.get(url)
@@ -28,19 +31,19 @@ def check_prices():
     # Kontrollera om priset är under tröskelvärdet
     if price_sek < threshold_price:
         shelly.relay(0, turn=True)
-        print(url) #För temporär koll
-        print(f"Relä aktiverat vid pris {price_sek} SEK/kWh")
+        text = Text(f"✓ Relä aktiverat vid pris {price_sek:.2f} SEK/kWh", style="bold green")
+        console.print(text)
     else:
         shelly.relay(0, turn=False)
-        print(url) #För temporär koll
-        print(f"Relä avaktiverat vid pris {price_sek} SEK/kWh")
+        text = Text(f"✗ Relä avaktiverat vid pris {price_sek:.2f} SEK/kWh", style="bold red")
+        console.print(text)
 
 # Räknar ut nästa heltimme
 def wait_until_next_hour():
     now = datetime.now()
     next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
     time_to_wait = (next_hour - now).total_seconds()
-    print(f"Väntar till nästa hel timme: {next_hour}")
+    console.print(f"Väntar till nästa hel timme: {next_hour}", style="cyan")
     time.sleep(time_to_wait)
 
 # Loop för att kontrollera priset varje timme
