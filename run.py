@@ -37,11 +37,11 @@ def check_prices():
     # Kontrollera om priset är under tröskelvärdet
     if price_sek < threshold_price:
         shelly.relay(0, turn=True)
-        text = Text(f"✓ Relä aktiverat vid pris {price_sek:.2f} SEK/kWh", style="bold green")
+        text = Text(f" ✓ Relä aktiverat vid pris {price_sek:.2f} SEK/kWh", style="bold green")
         console.print(text)
     else:
         shelly.relay(0, turn=False)
-        text = Text(f"✗ Relä avaktiverat vid pris {price_sek:.2f} SEK/kWh", style="bold red")
+        text = Text(f" ✗ Relä avaktiverat vid pris {price_sek:.2f} SEK/kWh", style="bold red")
         console.print(text)
 
 # Räknar ut nästa heltimme
@@ -49,7 +49,7 @@ def wait_until_next_hour():
     now = datetime.now()
     next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
     time_to_wait = (next_hour - now).total_seconds()
-    console.print(f"Väntar till nästa hel timme: {next_hour}", style="cyan")
+    console.print(f" Väntar till nästa hel timme: {next_hour}", style="cyan")
     time.sleep(time_to_wait)
 
 # Loop för att kontrollera priset varje timme
