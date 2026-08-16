@@ -7,10 +7,11 @@ Gör run.sh körbar:
 
 ```sh
 chmod +x run.sh
-````
+```
 
 Kör:
 
 ```sh
 ./run.sh
 ```
+run.sh skapar en virtuell miljö (venv) om ingen är uppstatt och startar sedan skriptet.
